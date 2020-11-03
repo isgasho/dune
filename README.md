@@ -76,3 +76,23 @@ func main() {
 	fmt.Println(v, err)
 }
 ```
+
+
+## Cross compile from linux.
+
+CGO is necessary for sqlite support.
+
+To install a Windows C compiler in Ubuntu
+
+```
+sudo apt-get install mingw-w64
+```
+
+```
+GOOS=darwin GOARCH=amd64 go build -o dune-mac cmd/dune/main.go
+
+GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc go build -o dune.exe cmd/dune/main.go
+
+GOOS=windows GOARCH=386 CGO_ENABLED=1 CC=i586-mingw32msvc-gcc go build -o dune.exe cmd/dune/main.go
+```
+
