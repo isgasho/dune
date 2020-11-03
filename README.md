@@ -20,9 +20,10 @@ Hello, World!
 ```
 
 
-The syntax is a subset of Typescript to get type checking, autocompletion and refactoring from editors like VS Code. 
+The syntax is a subset of Typescript. This allows to get type checking, autocomplete and refactoring support from editors like VSCode.
 
-To get autocompletion generate a typescript project and type definitions.
+Generate a project and type definitions 
+
 ```
 $ dune -init
 ```
@@ -50,7 +51,6 @@ Checkout more [examples](https://github.com/scorredoira/dune-examples).
 ## REPL
 ```
 $ dune
-
 DUNE 0.93 Build
 commands: :paste, list, asm, quit
 
