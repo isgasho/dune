@@ -561,9 +561,9 @@ declare namespace http {
         remoteAddr: string
         remoteIP: string
 
-		/**
-		 * The extension of the URL
-		 */
+        /**
+         * The extension of the URL
+         */
         extension: string
 
         // string returns the first value for the named component of the query.
@@ -790,28 +790,28 @@ declare namespace i18n {
     export function getCulture(name: string): Culture
     export function format(pattern: string, value: any): string
     export function translate(culture: string, key: string): string
-    export function addTranslation(culture: string, key: string, translation: string, tenant?: string): void
+    export function addTranslation(culture: string, key: string, translation: string): void
     export function addResources(culture: string, name: string, resources: any[]): void
 
 
 
-	/**
+    /**
      *  Example:
-			"es-ES",
-			',',
-			'.',
-			"EUR",
-			"€",
-			"0:00€",
-			"0:0000€",
-			"0:00",
-			"dd-MM-yyyy HH:mm",
-			"ddd, dd-MM-yyyy HH:mm",
-			"dd-MM-yyyy",
-			"ddd, dd MMM yyyy",
-			"HH:mm",
-			"HH:mm:ss",
-			time.Monday,
+            "es-ES",
+            ',',
+            '.',
+            "EUR",
+            "€",
+            "0:00€",
+            "0:0000€",
+            "0:00",
+            "dd-MM-yyyy HH:mm",
+            "ddd, dd-MM-yyyy HH:mm",
+            "dd-MM-yyyy",
+            "ddd, dd MMM yyyy",
+            "HH:mm",
+            "HH:mm:ss",
+            time.Monday,
      */
     export function addCulture(
         name: string,
@@ -1363,7 +1363,6 @@ declare namespace runtime {
         language: string
         culture: i18n.Culture
         location: time.Location
-        tenant: string
         debug: boolean
         test: boolean
         items: { [key: string]: any }
@@ -1754,10 +1753,10 @@ interface String {
     lastIndexOf(s: string, start?: number): number
 
 
-	/**
-	 * Replace with regular expression.
-	 * The syntax is defined: https://golang.org/pkg/regexp/syntax
-	 */
+    /**
+     * Replace with regular expression.
+     * The syntax is defined: https://golang.org/pkg/regexp/syntax
+     */
     replaceRegex(expr: string, replace: string): string
 }
 

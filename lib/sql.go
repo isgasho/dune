@@ -229,7 +229,7 @@ var SQL = []dune.NativeFunction{
 					return dune.NullValue, fmt.Errorf("argument 3 must be a string, got %s", args[2].TypeName())
 				}
 				name := args[2].ToString()
-				if err := validateTenant(name); err != nil {
+				if err := validateDatabaseName(name); err != nil {
 					return dune.NullValue, err
 				}
 				db = db.Open(name)
@@ -428,22 +428,22 @@ var SQL = []dune.NativeFunction{
 	},
 }
 
-func validateTenant(name string) error {
+func validateDatabaseName(name string) error {
 	if name == "" {
-		return fmt.Errorf("invalid tenant: null")
+		return fmt.Errorf("invalid name: null")
 	}
 
 	if !IsIdent(name) {
-		return fmt.Errorf("invalid tenant name. It can only contain alphanumeric values")
+		return fmt.Errorf("invalid name. It can only contain alphanumeric values")
 	}
 
 	l := len(name)
 	if l < 3 {
-		return fmt.Errorf("tenant name too short. Min 3 chars")
+		return fmt.Errorf("name too short. Min 3 chars")
 	}
 
 	if l > 40 {
-		return fmt.Errorf("tenant name too long. Max 40 chars")
+		return fmt.Errorf("name too long. Max 40 chars")
 	}
 
 	switch name {
@@ -826,11 +826,11 @@ func (s *libDB) SetProperty(name string, v dune.Value, vm *dune.VM) error {
 		if v.Type != dune.String {
 			return fmt.Errorf("expected string, got %s", v.TypeName())
 		}
-		tenant := v.ToString()
-		if err := validateTenant(tenant); err != nil {
+		name := v.ToString()
+		if err := validateDatabaseName(name); err != nil {
 			return err
 		}
-		s.db.Database = tenant
+		s.db.Database = name
 		return nil
 
 	case "readOnly":
@@ -968,7 +968,7 @@ func (s *libDB) open(args []dune.Value, vm *dune.VM) (dune.Value, error) {
 
 	name := args[0].ToString()
 
-	if err := validateTenant(name); err != nil {
+	if err := validateDatabaseName(name); err != nil {
 		return dune.NullValue, err
 	}
 
