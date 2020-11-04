@@ -362,6 +362,7 @@ func (l *Lexer) Run() error {
 					if strings.HasPrefix(trimmed, "[") && strings.HasSuffix(trimmed, "]") {
 						token.Type = DIRECTIVE
 						str = trimmed[1 : len(trimmed)-1]
+						str = strings.TrimLeft(str, " \t")
 					} else {
 						token.Type = COMMENT
 					}
