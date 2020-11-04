@@ -345,8 +345,11 @@ func (vm *VM) runFunc(f *Function, finalizeGlobals bool, closures []*closureRegi
 	vm.tryCatchs = currentTryCatchs
 	vm.fp = currentFp
 
-	if vm.Error != nil && vm.Error != io.EOF {
-		return NullValue, vm.Error
+	err := vm.Error
+	vm.Error = nil
+
+	if err != nil && err != io.EOF {
+		return NullValue, err
 	}
 
 	return vm.RetValue, nil
