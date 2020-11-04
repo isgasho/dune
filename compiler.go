@@ -606,11 +606,11 @@ func (c *compiler) compileForStmt(t *ast.ForStmt) error {
 	}
 
 	if t.Declaration == nil && t.Expression == nil && t.Step == nil {
-		// syntax:: "for (;;) {}"
+		// syntax: "for (;;) {}"
 		return c.compileForWithNoExpression(t)
 	}
 
-	// syntax:: "for (let i=0; i < 10; i++) {}"
+	// syntax: "for (let i=0; i < 10; i++) {}"
 	return c.compileForWithStepStmt(t)
 }
 

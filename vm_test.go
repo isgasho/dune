@@ -2318,7 +2318,7 @@ func TestGlobalScope(t *testing.T) {
 
 func TestProgramPermissions1(t *testing.T) {
 	p, err := CompileStr(`
-		// ::permissions foo
+		// [permissions foo]
 	`)
 
 	if err != nil {
@@ -2345,7 +2345,7 @@ func TestProgramPermissions1(t *testing.T) {
 
 func TestDirectives(t *testing.T) {
 	p, err := CompileStr(`
-		// ::anonymous
+		// [anonymous]
 		export function index_GET(c: WebContext) {
 			c.response.write("Hello world!! \n")
 		}

@@ -169,8 +169,6 @@ const (
 
 const (
 	eof = byte(EOF)
-	// prefix for directive comments
-	directive = "::"
 )
 
 type Position struct {
@@ -361,9 +359,9 @@ func (l *Lexer) Run() error {
 					str := buf.String()
 
 					trimmed := strings.TrimLeft(str, " \t")
-					if strings.HasPrefix(trimmed, directive) {
+					if strings.HasPrefix(trimmed, "[") && strings.HasSuffix(trimmed, "]") {
 						token.Type = DIRECTIVE
-						str = trimmed[len(directive):]
+						str = trimmed[1 : len(trimmed)-1]
 					} else {
 						token.Type = COMMENT
 					}

@@ -30,7 +30,7 @@ func TestLex(t *testing.T) {
 		{"i := 1 + b", []Type{IDENT, DECL, INT, ADD, IDENT}},
 		{"\"bar \\n  foo\"", []Type{STRING}},
 		{"`xxxxx \n  qqqqq`", []Type{STRING}},
-		{"// ::foo", []Type{DIRECTIVE}},
+		{"// [foo]", []Type{DIRECTIVE}},
 		{`a := 0 // bla bla bla
 		  // this is a comment
 		  b := 0`, []Type{IDENT, DECL, INT, COMMENT,

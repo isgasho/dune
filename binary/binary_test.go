@@ -13,7 +13,7 @@ func TestClasses(t *testing.T) {
 			return new Foo().get()
 		}
 
-		// ::classDirective
+		// [classDirective]
 		class Foo {
 			v
 			constructor() {
@@ -77,9 +77,9 @@ func TestEnum(t *testing.T) {
 
 func TestBinary1(t *testing.T) {
 	p := compile(t, `
-		// ::foo var
+		// [foo var]
 
-		// ::funcDirective
+		// [funcDirective]
 		function main() { 
 			return 2 + 3
 		}

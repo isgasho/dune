@@ -9,7 +9,7 @@ import (
 
 func TestParseFuncDirectives(t *testing.T) {
 	a, err := ParseStr(`
-		// ::directive1
+		// [directive1]
 		function bar() {
 
 		}
@@ -36,10 +36,10 @@ func TestParseFuncDirectives(t *testing.T) {
 
 func TestParseFuncDirectives2(t *testing.T) {
 	a, err := ParseStr(`
-		// ::directive ignore
+		// [directive ignore]
 
-		// ::directive1
-		// ::directive2 foo
+		// [directive1]
+		// [directive2 foo]
 		function bar() {
 
 		}
@@ -70,7 +70,7 @@ func TestParseFuncDirectives2(t *testing.T) {
 
 func TestParseClassDirectives(t *testing.T) {
 	a, err := ParseStr(`
-		// ::directive1
+		// [directive1]
 		class bar { }
 	`)
 

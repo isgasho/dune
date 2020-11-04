@@ -22,9 +22,9 @@ func TestCodeRemovesNewline(t *testing.T) {
 
 func TestDirectives(t *testing.T) {
 	buf, _, err := Compile(`
-	<%@ // ::foo %>
+	<%@ // [foo] %>
 	
-	<%@ // ::foo bar %>
+	<%@ // [foo bar] %>
 
 	`)
 	if err != nil {
