@@ -173,24 +173,20 @@ func findPath(name string) (string, error) {
 		return name, nil
 	}
 
-	if path := tryPath(filepath.Join("server/commands", name)); path != "" {
-		return path, nil
-	}
-
 	if path := tryPath(name); path != "" {
-		return path, nil
-	}
-
-	if path := tryPath(filepath.Join("bin", name)); path != "" {
 		return path, nil
 	}
 
 	// if it is just the name of the command search in envDirs
 	if !strings.ContainsRune(name, os.PathSeparator) && filepath.Ext(name) == "" {
-		for _, dir := range envDirs() {
-			n := filepath.Join(dir, name)
-			if path := tryPath(n); path != "" {
-				return path, nil
+		path := os.Getenv("DUNE_DIRS")
+		if path != "" {
+			dirs := split(path, ":")
+			for _, dir := range dirs {
+				n := filepath.Join(dir, name)
+				if path := tryPath(n); path != "" {
+					return path, nil
+				}
 			}
 		}
 	}
@@ -240,12 +236,6 @@ func writeIfNotExists(fs filesystem.FS, name string, data []byte) {
 		return
 	}
 	fs.WritePath(name, data)
-}
-
-func envDirs() []string {
-	path := os.Getenv("DUNEPATH")
-	dirs := split(path, ":")
-	return dirs
 }
 
 func fatal(values ...interface{}) {
