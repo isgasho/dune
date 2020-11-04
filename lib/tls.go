@@ -47,8 +47,11 @@ declare namespace tls {
 
 declare namespace autocert {
 	export interface CertManager {
+
 	}
+
 	export function newCertManager(dirCache: string, domains: string[], cache?: Cache): CertManager
+	export function newCertManager(dirCache: string, hostPolicy: (host: string) => void, cache?: Cache): CertManager
 
 	export interface Cache {
 	}
@@ -63,20 +66,14 @@ var TLS = []dune.NativeFunction{
 		Name:      "autocert.newCertManager",
 		Arguments: -1,
 		Function: func(this dune.Value, args []dune.Value, vm *dune.VM) (dune.Value, error) {
-			if err := ValidateOptionalArgs(args, dune.String, dune.Array, dune.Object); err != nil {
-				return dune.NullValue, err
-			}
-
 			if err := ValidateArgRange(args, 2, 3); err != nil {
 				return dune.NullValue, err
 			}
 
-			var cacheDir string
-			var values []dune.Value
 			var cache *autocertCache
 
 			ln := len(args)
-			if ln < 2 {
+			if ln < 2 || ln > 3 {
 				return dune.NullValue, fmt.Errorf("expected 2 or 3 arguments, got %d", ln)
 			}
 
@@ -84,29 +81,46 @@ var TLS = []dune.NativeFunction{
 				return dune.NullValue, fmt.Errorf("invalid cache directory: %s", args[0].TypeName())
 			}
 
-			if args[1].Type != dune.Array {
-				return dune.NullValue, fmt.Errorf("invalid domains: %s", args[1].TypeName())
+			cacheDir := args[0].ToString()
+
+			var hostPolicy autocert.HostPolicy
+			switch args[1].Type {
+			case dune.Array:
+				domainValues := args[1].ToArray()
+				domains := make([]string, len(domainValues))
+				for i, v := range domainValues {
+					domains[i] = v.ToString()
+				}
+				hostPolicy = autocert.HostWhitelist(domains...)
+
+			case dune.Func:
+				hostPolicy = func(ctx context.Context, host string) error {
+					vm = vm.Clone(vm.Program, vm.Globals())
+					_, err := vm.RunFuncIndex(args[1].ToFunction(), dune.NewString(host))
+					return err
+				}
+
+			case dune.Object:
+				c, ok := args[1].ToObjectOrNil().(*dune.Closure)
+				if !ok {
+					return dune.NullValue, fmt.Errorf("expected a function, got: %s", args[1].TypeName())
+				}
+				hostPolicy = func(ctx context.Context, host string) error {
+					vm = vm.Clone(vm.Program, vm.Globals())
+					_, err := vm.RunClosure(c, dune.NewString(host))
+					return err
+				}
+
+			default:
+				return dune.NullValue, fmt.Errorf("invalid domains or hostPolicy: %s", args[1].TypeName())
 			}
 
-			switch ln {
-			case 2:
-				cacheDir = args[0].ToString()
-				values = args[1].ToArray()
-			case 3:
-				cacheDir = args[0].ToString()
-				values = args[1].ToArray()
+			if ln == 3 {
 				var ok bool
 				cache, ok = args[2].ToObjectOrNil().(*autocertCache)
 				if !ok {
 					return dune.NullValue, fmt.Errorf("invalid cache: %s", args[2].TypeName())
 				}
-			default:
-				return dune.NullValue, fmt.Errorf("expected 2 or 3 arguments, got %d", ln)
-			}
-
-			domains := make([]string, len(values))
-			for i, v := range values {
-				domains[i] = v.ToString()
 			}
 
 			if cache == nil {
@@ -118,7 +132,7 @@ var TLS = []dune.NativeFunction{
 			m := autocert.Manager{
 				Cache:      cache,
 				Prompt:     autocert.AcceptTOS,
-				HostPolicy: autocert.HostWhitelist(domains...),
+				HostPolicy: hostPolicy,
 			}
 
 			cm := &certManager{&m}
