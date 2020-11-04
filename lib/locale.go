@@ -25,9 +25,9 @@ declare namespace locale {
 	export const defaultLocalizer: Localizer
 	export function setDefaultLocalizer(c: Localizer): void
 
-	export format(format: string, v: any): string
-	export parseNumber(v: string): number
-	export parseDate(v: string, format?: string): time.Time
+	export function format(format: string, v: any): string
+	export function parseNumber(v: string): number
+	export function parseDate(v: string, format?: string): time.Time
 
 	export function newCulture(name: string): Culture
 
@@ -61,7 +61,7 @@ declare namespace locale {
 		culture: Culture
 		translator: Translator
 		
-		translate(language: srting, template: string, ...values: any[]): string
+		translate(language: string, template: string, ...values: any[]): string
 		format(format: string, v: any, language?: string): string
 		parseNumber(v: string): number
 		parseDate(value: string, format?: string): time.Time

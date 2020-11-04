@@ -17,7 +17,7 @@ func init() {
 
 declare namespace logging {	
     export const defaultLogger: Logger
-	export function setDefaultLogger(logging: Logging): void
+	export function setDefaultLogger(logger: Logger): void
 	
     export function fatal(format: any, ...v: any[]): void
     export function system(format: any, ...v: any[]): void

@@ -26,7 +26,7 @@ declare namespace runtime {
 declare namespace runtime {
 	export const ErrFunctionNotExist: string
 
-    export interface Finalizable {
+    export interface Finalizable { 
         close(): void
 	}
 	
