@@ -30,6 +30,13 @@ $ dune -init
 
 ## Examples
 
+Array built in functions:
+```typescript
+let items = [1, 2, 3, 4, 5]
+let v = items.where(t => t > 2).select(t => t + 3).sum()
+console.log(v)
+```
+
 A web server:
 ```typescript
 let s = http.newServer()
@@ -38,11 +45,15 @@ s.handler = (w, r) => w.write("Hello world")
 s.start() 
 ```
 
-Array built in functions:
+With autocert:
 ```typescript
-let items = [1, 2, 3, 4, 5]
-let v = items.where(t => t > 2).select(t => t + 3).sum()
-console.log(v)
+let tlsconf = tls.newConfig()
+tlsconf.certManager = autocert.newCertManager("certs", ["example.com"])
+
+let s = http.newServer()
+s.tlsConfig = tlsconf
+s.handler = (w, r) => w.write("Hello world")
+s.start()
 ```
 
 Checkout more [examples](https://github.com/scorredoira/dune-examples).
