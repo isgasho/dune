@@ -123,7 +123,6 @@ declare namespace runtime {
 		initialize(): any[]
 		run(...args: any[]): any
 		runFunc(name: string, ...args: any[]): any
-		runLibFunc(name: string, ...args: any[]): any
 		runFunc(index: number, ...args: any[]): any
 		runStaticFunc(name: string, ...args: any[]): any
 		runStaticFunc(index: number, ...args: any[]): any
@@ -1010,8 +1009,6 @@ func (m *libVM) GetMethod(name string) dune.NativeMethod {
 		return m.run
 	case "runFunc":
 		return m.runFunc
-	case "runLibFunc":
-		return m.runLibFunc
 	case "runStaticFunc":
 		return m.runStaticFunc
 	case "clone":
@@ -1102,41 +1099,6 @@ func (m *libVM) runStaticFunc(args []dune.Value, vm *dune.VM) (dune.Value, error
 
 func (m *libVM) runFunc(args []dune.Value, vm *dune.VM) (dune.Value, error) {
 	return m.runFunction(args, vm, true)
-}
-
-func (m *libVM) runLibFunc(args []dune.Value, vm *dune.VM) (dune.Value, error) {
-	if !vm.HasPermission("trusted") {
-		return dune.NullValue, ErrUnauthorized
-	}
-
-	l := len(args)
-	if l == 0 {
-		return dune.NullValue, fmt.Errorf("expected at least 1 parameter, got %d", l)
-	}
-
-	if !m.vm.Initialized() {
-		if err := m.vm.Initialize(); err != nil {
-			return dune.NullValue, m.vm.WrapError(err)
-		}
-		if err := vm.AddSteps(m.vm.Steps()); err != nil {
-			return dune.NullValue, m.vm.WrapError(err)
-		}
-	}
-
-	name := args[0].ToString()
-
-	v, err := m.vm.RunLibFunc(name, args[1:]...)
-	if err != nil {
-		// return the error with the stacktrace included in the message
-		// because the caller in the program will have it's own stacktrace.
-		return dune.NullValue, m.vm.WrapError(err)
-	}
-
-	if err := vm.AddSteps(m.vm.Steps()); err != nil {
-		return dune.NullValue, m.vm.WrapError(err)
-	}
-
-	return v, nil
 }
 
 func (m *libVM) runFunction(args []dune.Value, vm *dune.VM, initialize bool) (dune.Value, error) {

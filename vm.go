@@ -228,35 +228,6 @@ func (vm *VM) Run(args ...Value) (Value, error) {
 	return vm.runFunc(f, true, nil, args...)
 }
 
-// RunLibFunc executes a function from a library
-func (vm *VM) RunLibFunc(name string, args ...Value) (Value, error) {
-	var f *Function
-
-	p := vm.Program
-	if p.libFuncMap == nil {
-		p.libFuncMap = make(map[string]*Function)
-	} else {
-		f = p.libFuncMap[name]
-	}
-
-	if f == nil {
-		for _, ff := range p.Functions {
-			if strings.HasSuffix(ff.Name, name) {
-				f = ff
-				break
-			}
-		}
-
-		if f == nil {
-			return NullValue, fmt.Errorf("%s: %w", name, ErrFunctionNotExist)
-		}
-
-		p.libFuncMap[name] = f
-	}
-
-	return vm.runFunc(f, false, nil, args...)
-}
-
 // RunFunc executes a function by name
 func (vm *VM) RunFunc(name string, args ...Value) (Value, error) {
 	f, ok := vm.Program.Function(name)

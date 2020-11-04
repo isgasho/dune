@@ -273,9 +273,8 @@ type Program struct {
 	permissions []string
 	Resources   map[string][]byte
 
-	kSize      int // the memory for all constants
-	funcMap    map[string]*Function
-	libFuncMap map[string]*Function
+	kSize   int // the memory for all constants
+	funcMap map[string]*Function
 }
 
 func (p *Program) Permissions() []string {
