@@ -182,35 +182,7 @@ func NewNativeFunction(v int) Value {
 
 // Convert the object to a string
 func (v Value) ToString() string {
-	switch v.Type {
-	case String:
-		return v.object.(string)
-	case Rune:
-		return string(v.object.(rune))
-	case Null:
-		return "null"
-	case Undefined:
-		return "undefined"
-	case Int:
-		return strconv.FormatInt(v.object.(int64), 10)
-	case Float:
-		return fmt.Sprint(v.object)
-	case Bool:
-		if v.object.(bool) {
-			return "true"
-		}
-		return "false"
-	case Bytes:
-		return string(v.object.([]byte))
-	case Object:
-		st, ok := v.object.(fmt.Stringer)
-		if ok {
-			return st.String()
-		}
-		return fmt.Sprintf("%T", v.object)
-	default:
-		return fmt.Sprintf("%T", v.object)
-	}
+	return v.String()
 }
 
 func (v Value) MarshalJSON() ([]byte, error) {
@@ -394,18 +366,10 @@ func (v Value) String() string {
 	case Null:
 		return "null"
 	case String:
-		s := v.object.(string)
-		if len(s) > 200 {
-			s = s[:200]
-		}
-		return s
+		return v.object.(string)
 	case Int:
 		return strconv.FormatInt(v.ToInt(), 10)
 	case Float:
-		f := v.ToFloat()
-		if f == 0.0 {
-			return "0" // prevent negative zero
-		}
 		return strconv.FormatFloat(v.ToFloat(), 'f', 6, 64)
 	case Bool:
 		if v.ToBool() {
@@ -421,11 +385,7 @@ func (v Value) String() string {
 	case NativeFunc:
 		return "[native function]"
 	case Bytes:
-		s := string(v.object.([]byte))
-		if len(s) > 30 {
-			s = s[:30]
-		}
-		return s
+		return "[bytes]"
 	case Map:
 		return "[map]"
 	case Object:
@@ -438,9 +398,9 @@ func (v Value) String() string {
 		if n, ok := v.object.(NamedType); ok {
 			return n.Type()
 		}
-		return fmt.Sprintf("%T", v.object)
+		return fmt.Sprintf("[%T]", v.object)
 	default:
-		return fmt.Sprintf("%v", v.Type)
+		return fmt.Sprintf("[%v]", v.Type)
 	}
 }
 

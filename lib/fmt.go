@@ -38,17 +38,7 @@ var libFmt = []dune.NativeFunction{
 
 			values := make([]interface{}, argsLen-1)
 			for i, a := range args[1:] {
-				switch a.Type {
-				case dune.Null:
-					values[i] = "null"
-				default:
-					o := a.Export(0)
-					if o == nil {
-						values[i] = "null"
-					} else {
-						values[i] = o
-					}
-				}
+				values[i] = a.Export(0)
 			}
 
 			key := v.ToString()
@@ -81,21 +71,7 @@ var libFmt = []dune.NativeFunction{
 		Arguments: -1,
 		Function: func(this dune.Value, args []dune.Value, vm *dune.VM) (dune.Value, error) {
 			for _, v := range args {
-				switch v.Type {
-				case dune.Undefined:
-					fmt.Fprint(vm.GetStdout(), "undefined")
-				case dune.Float:
-					fmt.Fprint(vm.GetStdout(), v.String())
-				default:
-					o := v.Export(0)
-					if o == nil {
-						fmt.Fprint(vm.GetStdout(), "null")
-					} else if s, ok := o.(fmt.Stringer); ok {
-						fmt.Fprint(vm.GetStdout(), s.String())
-					} else {
-						fmt.Fprint(vm.GetStdout(), o)
-					}
-				}
+				fmt.Fprint(vm.GetStdout(), v.String())
 			}
 			return dune.NullValue, nil
 		},
@@ -108,22 +84,7 @@ var libFmt = []dune.NativeFunction{
 				if i > 0 {
 					fmt.Fprint(vm.GetStdout(), " ")
 				}
-
-				switch v.Type {
-				case dune.Undefined:
-					fmt.Fprint(vm.GetStdout(), "undefined")
-				case dune.Float:
-					fmt.Fprint(vm.GetStdout(), v.String())
-				default:
-					o := v.Export(0)
-					if o == nil {
-						fmt.Fprint(vm.GetStdout(), "null")
-					} else if s, ok := o.(fmt.Stringer); ok {
-						fmt.Fprint(vm.GetStdout(), s.String())
-					} else {
-						fmt.Fprint(vm.GetStdout(), o)
-					}
-				}
+				fmt.Fprint(vm.GetStdout(), v.String())
 			}
 			fmt.Fprint(vm.GetStdout(), "\n")
 			return dune.NullValue, nil
@@ -144,20 +105,7 @@ var libFmt = []dune.NativeFunction{
 
 			values := make([]interface{}, l-1)
 			for i, v := range args[1:] {
-				switch v.Type {
-				case dune.Null:
-					values[i] = "null"
-				case dune.String:
-					// need to escape the % to prevent interfering with fmt
-					values[i] = dune.NewString(strings.Replace(v.ToString(), "%", "%%", -1))
-				default:
-					o := v.Export(0)
-					if o == nil {
-						values[i] = "null"
-					} else {
-						values[i] = o
-					}
-				}
+				values[i] = v.String()
 			}
 
 			fmt.Fprintf(vm.GetStdout(), v.ToString(), values...)
@@ -185,20 +133,7 @@ var libFmt = []dune.NativeFunction{
 
 			values := make([]interface{}, l-2)
 			for i, v := range args[2:] {
-				switch v.Type {
-				case dune.Null:
-					values[i] = "null"
-				case dune.String:
-					// need to escape the % to prevent interfering with fmt
-					values[i] = dune.NewString(strings.Replace(v.ToString(), "%", "%%", -1))
-				default:
-					o := v.Export(0)
-					if o == nil {
-						values[i] = "null"
-					} else {
-						values[i] = o
-					}
-				}
+				values[i] = v
 			}
 
 			fmt.Fprintf(w, v.ToString(), values...)
@@ -220,17 +155,7 @@ var libFmt = []dune.NativeFunction{
 
 			values := make([]interface{}, l-1)
 			for i, v := range args[1:] {
-				switch v.Type {
-				case dune.Null:
-					values[i] = "null"
-				default:
-					o := v.Export(0)
-					if o == nil {
-						values[i] = "null"
-					} else {
-						values[i] = o
-					}
-				}
+				values[i] = v
 			}
 
 			s := fmt.Sprintf(v.ToString(), values...)
