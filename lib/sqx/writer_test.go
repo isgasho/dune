@@ -2,7 +2,6 @@ package sqx
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 	"time"
 )
@@ -110,31 +109,6 @@ func TestSubquery2(t *testing.T) {
 	}
 
 	if s != `SELECT a FROM (SELECT * FROM bar)` {
-		t.Fatal(s)
-	}
-}
-
-func TestConcatSqlite(t *testing.T) {
-	q, err := Parse("select concat_ws(foo, bar)")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	s, _, err := toSQL(false, q, "", "")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if s != `SELECT CONCAT_WS(foo, bar)` {
-		t.Fatal(s)
-	}
-
-	s, _, err = toSQL(false, q, "", "sqlite3")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if s != `SELECT foo || bar` {
 		t.Fatal(s)
 	}
 }
@@ -411,7 +385,7 @@ func TestDbPrefix2(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	w := NewWriter(q, "foo", "sqlite3")
+	w := NewWriter(q, "foo", "mysql")
 	w.EscapeIdents = true
 
 	s, _, err := w.Write()
@@ -419,7 +393,7 @@ func TestDbPrefix2(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if s != "SELECT `id` FROM `foo_cars`" {
+	if s != "SELECT `id` FROM `foo`.`cars`" {
 		t.Fatal(s)
 	}
 }
@@ -430,12 +404,12 @@ func TestDbPrefix3(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	s, _, err := toSQL(false, q, "foo", "sqlite3")
+	s, _, err := toSQL(false, q, "foo", "mysql")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if s != `SELECT id FROM foo_cars` {
+	if s != `SELECT id FROM foo.cars` {
 		t.Fatal(s)
 	}
 }
@@ -1140,22 +1114,6 @@ func TestParseUpdateJoinMixed(t *testing.T) {
 	}
 }
 
-func TestParseUpdateJoinSqlite(t *testing.T) {
-	q, err := Parse("UPDATE a RIGHT JOIN b ON a.id = b.ida SET status=? WHERE id=?", nil, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	s, _, err := toSQL(false, q, "", "sqlite3")
-	if err == nil {
-		t.Fatalf("Expected failure in sqlite3: %v", s)
-	}
-
-	if !strings.Contains(err.Error(), "UPDATE JOIN not supported in sqlite3") {
-		t.Fatalf("Unexpected error got %v", err)
-	}
-}
-
 func TestParseUpdateAlias(t *testing.T) {
 	q, err := Parse("UPDATE aa a JOIN bb b ON a.id = b.ida SET status=? WHERE id=?", nil, nil)
 	if err != nil {
@@ -1281,18 +1239,6 @@ func TestParseDeleteJoinMixed(t *testing.T) {
 
 	if s != `DELETE a, b, c FROM a LEFT JOIN b ON a.id = b.ida RIGHT JOIN c ON b.id = c.idb WHERE id > 5` {
 		t.Fatal(s)
-	}
-}
-
-func TestParseDeleteJoinSqlite(t *testing.T) {
-	q, err := Parse("Delete a,b FROM a RIGHT JOIN b ON a.id = b.ida WHERE id=?", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	s, _, err := toSQL(false, q, "", "sqlite3")
-	if err == nil {
-		t.Fatalf("Expected failure in sqlite3: %v", s)
 	}
 }
 

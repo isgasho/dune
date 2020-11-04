@@ -1,6 +1,3 @@
-// Package sqx is a sql parser.
-//
-//It supports mysql and sqlite3.
 package sqx
 
 import (
@@ -254,15 +251,6 @@ func (p *writer) writeModifyColumnQuery(q *ModifyColumnQuery) error {
 func (p *writer) writeDelete(s *DeleteQuery) error {
 	p.currentQuery = s
 
-	if p.driver == "sqlite3" {
-		if len(s.Table.Joins) > 0 {
-			return fmt.Errorf("invalid operation: UPDATE JOIN not supported in sqlite3")
-		}
-		if len(s.Table.Alias) > 0 {
-			return fmt.Errorf("invalid operation: UPDATE with Alias not supported in sqlite3")
-		}
-	}
-
 	p.buf.WriteString("DELETE")
 
 	if len(s.Alias) > 1 {
@@ -309,15 +297,6 @@ func (p *writer) writeDelete(s *DeleteQuery) error {
 
 func (p *writer) writeUpdate(s *UpdateQuery) error {
 	p.currentQuery = s
-
-	if p.driver == "sqlite3" {
-		if len(s.Table.Joins) > 0 {
-			return fmt.Errorf("invalid operation: UPDATE JOIN not supported in sqlite3")
-		}
-		if len(s.Table.Alias) > 0 {
-			return fmt.Errorf("invalid operation: UPDATE with Alias not supported in sqlite3")
-		}
-	}
 
 	p.buf.WriteString("UPDATE ")
 
@@ -638,7 +617,7 @@ func (p *writer) writeCreateDatabase(s *CreateDatabaseQuery) error {
 	p.currentQuery = s
 
 	if p.driver == "sqlite3" {
-		return fmt.Errorf("not supported at %v", s.Pos)
+		return fmt.Errorf("not supported for sqlite")
 	}
 
 	p.buf.WriteString("CREATE DATABASE ")
@@ -1143,12 +1122,6 @@ func (p *writer) writeTable(database, table string) error {
 	}
 
 	if database != "" {
-		if p.driver == "sqlite3" {
-			// if it is sqlite3 use table prefix to simulate databases.
-			// Write as one identifier to avoid writing: `dbfoo`_`table`
-			return p.writeIdentifier(database + "_" + table)
-		}
-
 		if err := p.writeIdentifier(database); err != nil {
 			return err
 		}
@@ -1488,10 +1461,6 @@ func (p *writer) writeDateIntervalExpr(t *DateIntervalExpr) error {
 }
 
 func (p *writer) writeGroupConcat(t *GroupConcatExpr) error {
-	if p.driver == "sqlite3" {
-		return p.writeGroupConcatSqlite(t)
-	}
-
 	p.buf.WriteString("GROUP_CONCAT(")
 
 	if t.Distinct {
@@ -1527,22 +1496,6 @@ func (p *writer) writeGroupConcat(t *GroupConcatExpr) error {
 	return nil
 }
 
-func (p *writer) writeGroupConcatSqlite(t *GroupConcatExpr) error {
-	p.buf.WriteString("GROUP_CONCAT(")
-
-	for i, exp := range t.Expressions {
-		if i > 0 {
-			p.buf.WriteRune(',')
-		}
-		if err := p.writeExpr(exp); err != nil {
-			return err
-		}
-	}
-
-	p.buf.WriteRune(')')
-	return nil
-}
-
 func (p *writer) writeFuncCallExpr(t *CallExpr) error {
 	name := strings.ToUpper(t.Name)
 
@@ -1551,10 +1504,6 @@ func (p *writer) writeFuncCallExpr(t *CallExpr) error {
 	}
 
 	switch name {
-	case "CONCAT", "CONCAT_WS": // _ws is not the same but use whats available.
-		if p.driver == "sqlite3" {
-			return p.writeConcatSqlite(t)
-		}
 	case "UTC_TIMESTAMP", "NOW":
 		if p.driver == "sqlite3" {
 			return p.writeUTCTimestampSqlite(t)
@@ -1631,20 +1580,6 @@ func (p *writer) writeUTCTimestampSqlite(t *CallExpr) error {
 	}
 
 	p.buf.WriteString("datetime('now')")
-	return nil
-}
-
-func (p *writer) writeConcatSqlite(t *CallExpr) error {
-	for i, a := range t.Args {
-		if i > 0 {
-			p.buf.WriteString(" || ")
-		}
-
-		if err := p.writeExpr(a); err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 

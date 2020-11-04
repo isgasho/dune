@@ -1,7 +1,6 @@
 package sqx
 
 import (
-	"strings"
 	"testing"
 )
 
@@ -213,38 +212,6 @@ func TestShowTables2(t *testing.T) {
 	}
 }
 
-//func TestShowTables3(t *testing.T) {
-//	q, err := Parse("show tables from foo like ?")
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-
-//	s, _, err := toSQL(false,q, "", "mysql")
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-
-//	if s != "SHOW TABLES FROM foo LIKE ?" {
-//		t.Fatal(s)
-//	}
-//}
-
-func TestShowTablesSqlite(t *testing.T) {
-	q, err := Parse("show tables")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	s, _, err := toSQL(false, q, "", "sqlite3")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if s != `SELECT name FROM sqlite_master WHERE type = "table"` {
-		t.Fatal(s)
-	}
-}
-
 func TestShowColumns(t *testing.T) {
 	q, err := Parse("show columns from foo")
 	if err != nil {
@@ -257,22 +224,6 @@ func TestShowColumns(t *testing.T) {
 	}
 
 	if s != "SHOW COLUMNS FROM foo" {
-		t.Fatal(s)
-	}
-}
-
-func TestShowColumnsSqlite(t *testing.T) {
-	q, err := Parse("show columns from foo")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	s, _, err := toSQL(false, q, "", "sqlite3")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if s != "PRAGMA table_info(foo)" {
 		t.Fatal(s)
 	}
 }
@@ -293,21 +244,6 @@ func TestShowIndex(t *testing.T) {
 	}
 }
 
-func TestShowIndexSqlite(t *testing.T) {
-	q, err := Parse("show index from foo")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	s, _, err := toSQL(false, q, "", "sqlite3")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if s != "PRAGMA index_list(foo)" {
-		t.Fatal(s)
-	}
-}
 func TestDropIndex(t *testing.T) {
 	q, err := Parse("alter table foo drop index bar")
 	if err != nil {
@@ -321,18 +257,6 @@ func TestDropIndex(t *testing.T) {
 
 	if s != "ALTER TABLE foo DROP INDEX bar" {
 		t.Fatal(s)
-	}
-}
-
-func TestParseCreateDatabaseSqlite(t *testing.T) {
-	q, err := Parse("create database if not exists foo")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, _, err = toSQL(false, q, "", "sqlite3")
-	if err == nil || !strings.Contains(err.Error(), "not supported") {
-		t.Fatalf("Expected not supported error: %v", err)
 	}
 }
 
@@ -398,12 +322,12 @@ func TestParseCreateSqlite1(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	s, _, err := toSQL(false, q, "foo", "sqlite3")
+	s, _, err := toSQL(false, q, "", "sqlite3")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if s != "CREATE TABLE IF NOT EXISTS foo_cars ("+
+	if s != "CREATE TABLE IF NOT EXISTS cars ("+
 		"id INTEGER PRIMARY KEY NOT NULL, "+
 		"name VARCHAR(10) NOT NULL COLLATE NOCASE)" {
 		t.Fatal(s)

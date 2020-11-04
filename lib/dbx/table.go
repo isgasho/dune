@@ -382,12 +382,6 @@ func ParseDateTimeStr(str string) (time.Time, error) {
 		return time.Parse("2006-01-02", str)
 	}
 
-	// strip milliseconds and time offset (ej: +02:00) to
-	// have the same precision in mysql and sqlite
-	if l >= 19 {
-		str = str[:19]
-	}
-
 	var format string
 	switch str[10] {
 	case 'T':

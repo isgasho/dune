@@ -15,7 +15,6 @@ type DB struct {
 	sync.Mutex
 	*sql.DB
 	Driver   string
-	DSN      string // used only with sqlite3
 	Database string
 	ReadOnly bool
 	tx       *sql.Tx
@@ -38,12 +37,6 @@ func OpenDatabase(database, driver, dsn string) (*DB, error) {
 		DB:       db,
 	}
 
-	// save the dns in sqlite3 for schema queries.
-	if driver == "sqlite3" {
-		dx.DSN = dsn
-		dx.Database = ""
-	}
-
 	return dx, nil
 }
 
@@ -51,7 +44,6 @@ func OpenDatabase(database, driver, dsn string) (*DB, error) {
 func (db *DB) Open(database string) *DB {
 	return &DB{
 		Driver:   db.Driver,
-		DSN:      db.DSN,
 		Database: database,
 		ReadOnly: db.ReadOnly,
 		DB:       db.DB,

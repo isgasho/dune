@@ -5,7 +5,6 @@ import (
 	"io"
 	"strconv"
 	"strings"
-	"time"
 )
 
 func Select(code string, params ...interface{}) (*SelectQuery, error) {
@@ -74,7 +73,6 @@ func newError(tok *Token, format string, args ...interface{}) *Error {
 }
 
 func (p *Parser) SetParams(args []interface{}) {
-	processParams(args)
 	p.Params = args
 }
 
@@ -2439,15 +2437,4 @@ func (p *Parser) acceptString(s string) (*Token, error) {
 		return t, newError(t, "Expecting %s, got %s", s, t.Str)
 	}
 	return t, nil
-}
-
-func processParams(params []interface{}) {
-	for i, v := range params {
-		switch t := v.(type) {
-		case time.Time:
-			// convert all dates for the database into to UTC.
-			// The mysql driver does this automatically but the sqlite not.
-			params[i] = t.UTC()
-		}
-	}
 }

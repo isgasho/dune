@@ -6,34 +6,11 @@ import (
 	"strings"
 )
 
-func (db *DB) ExistsDatabase(name string) (bool, error) {
-	if !IsIdent(name) {
-		return false, fmt.Errorf("invalid db name '%s'", name)
-	}
-
-	query := fmt.Sprintf(`show databases like "%s"`, name)
-
-	if db.Driver == "sqlite3" {
-		// sqlite connection has only the current db file
-		return db.DSN == name, nil
-	}
-
-	rows, err := db.queryable().Query(query)
-	if err != nil {
-		return false, err
-	}
-	defer rows.Close()
-
-	// if the query has results then the table exists
-	return rows.Next(), nil
-}
-
 func (db *DB) Databases() (*Table, error) {
 	query := "show databases"
 
 	if db.Driver == "sqlite3" {
-		// sqlite connection has only the current db file
-		return db.sqliteDatabases(), nil
+		return nil, fmt.Errorf(("Unsuported in sqlite"))
 	}
 
 	rows, err := db.queryable().Query(query)
@@ -136,9 +113,6 @@ func (db *DB) sqliteTables() ([]string, error) {
 func (db *DB) Columns(table string) ([]SchemaColumn, error) {
 	switch db.Driver {
 	case "sqlite3":
-		if db.Database != "" {
-			table = db.Database + "_" + table
-		}
 		return db.sqliteColumns(table)
 	case "mysql":
 		return db.mysqlColumns(table)
@@ -207,13 +181,6 @@ func (db *DB) mysqlColumns(table string) ([]SchemaColumn, error) {
 	}
 
 	return columns, nil
-}
-
-func (db *DB) sqliteDatabases() *Table {
-	c := &Column{Name: "Database", Type: String}
-	t := &Table{Columns: []*Column{c}}
-	t.NewRow().Values = []interface{}{db.DSN}
-	return t
 }
 
 func (db *DB) queryBoolean(query string, args ...interface{}) (bool, error) {

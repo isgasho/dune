@@ -12,10 +12,8 @@ import (
 	"github.com/scorredoira/dune/filesystem"
 	"github.com/scorredoira/dune/parser"
 
-	_ "github.com/scorredoira/dune/lib"
-
 	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/scorredoira/dune/lib"
 )
 
 func printVersion() {

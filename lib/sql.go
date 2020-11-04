@@ -19,14 +19,12 @@ func init() {
 
 
 declare namespace sql {
-    export type DriverType = "mysql" | "sqlite3"
-
     /**
      * If you specify a databaseName every query will be parsed and all tables will be
      * prefixed with the database name: "SELECT foo FROM bar" will automatically be converted 
      * to "SELECT databasename.foo FROM bar". 
      */
-    export function open(driver: DriverType, connString: string, databaseName?: string): DB
+    export function open(driver: string, connString: string, databaseName?: string): DB
 	
 	export function setWhitelistFuncs(funcs: string[]): void
 	
@@ -37,7 +35,7 @@ declare namespace sql {
     export interface DB {
         database: string
         readOnly: boolean
-        driver: DriverType
+        driver: string
 		hasTransaction: boolean
 		
 		setMaxOpenConns(v: number): void
@@ -110,7 +108,7 @@ declare namespace sql {
     export function orderBy(s: string): SelectQuery
 
     export interface Query {
-        toSQL(format?: boolean, driver?: DriverType, escapeIdents?: boolean): string
+        toSQL(format?: boolean, driver?: string, escapeIdents?: boolean): string
     }
 
     export interface DQLQuery extends Query {
